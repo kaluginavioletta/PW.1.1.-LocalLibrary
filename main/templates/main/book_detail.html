@@ -1,0 +1,40 @@
+{% extends "base_generic.html" %}
+
+{% block title %}<title>Book detail</title>{% endblock %}
+
+{% block content %}
+
+<h1>Genre: {{ genre.name }}</h1>
+
+<div style="margin-left:20px;margin-top:20px">
+<h4>Books in genre</h4>
+
+<ul>
+  {% for copy in genre.book_set.all %}
+  <li>
+    <a href="{{ copy.get_absolute_url }}">{{ copy.title }}</a> ({{copy.author}})
+  </li>
+  {% empty %}
+  <li>There are no books in this genre.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
+
+
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if perms.catalog.change_book or perms.catalog.delete_book %}
+  <hr>
+  <ul class="sidebar-nav">
+    {% if perms.catalog.change_book %}
+      <li><a href="{% url 'book-update' book.id %}">Update Book</a></li>
+    {% endif %}
+    {% if not book.bookinstance_set.all and perms.catalog.delete_book %}
+      <li><a href="{% url 'book-delete' book.id %}">Delete Book</a></li>
+    {% endif %}
+    </ul>
+  {% endif %}
+
+{% endblock %}
