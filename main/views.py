@@ -51,7 +51,8 @@ class AuthorDetailView(generic.DetailView):
     model = Author
 
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
 
 class MyView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -126,3 +127,11 @@ class AuthorUpdate(UpdateView):
 class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
+
+class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
+    model = BookInstance
+    permission_required = 'main.can_mark_returned'
+    template_name = 'main/bookinstance_list_borrowed_all.html'
+    paginate_by = 10
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
